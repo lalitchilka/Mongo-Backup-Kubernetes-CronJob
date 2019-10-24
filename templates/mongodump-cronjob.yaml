@@ -1,0 +1,48 @@
+{{- if .Values.mongodbDump.enabled }}
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ template "mongodbDump.name" . }}
+spec:
+  schedule: "{{ .Values.mongodbDump.schedule }}"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: {{ template "mongodbDump.name" . }}
+              imagePullPolicy: {{ .Values.mongodbDump.deployment.imagePullPolicy }}
+              image: "{{ .Values.mongodbDump.deployment.image.repository }}:{{ .Values.mongodbDump.deployment.image.tag }}"
+              env:
+                - name: DB_HOST
+                  value: {{ .Values.mongodbDump.env.db.host }}
+                - name: DB_PORT
+                  value: "{{ .Values.mongodbDump.env.db.port }}"
+                - name: DB_NAME
+                  value: {{ .Values.mongodbDump.env.db.name }}
+                - name: DB_USER
+                  value: {{ .Values.mongodbDump.env.db.user }}
+                - name: DB_PASSWORD
+                  value: {{ .Values.mongodbDump.env.db.password }}
+                - name: SFTPPASSWORD
+                  value: {{ .Values.mongodbDump.env.sftp.password }}
+                - name: SFTPUSER
+                  value: {{ .Values.mongodbDump.env.sftp.user }}
+                - name: SFTPHOST
+                  value: {{ .Values.mongodbDump.env.sftp.host }}
+                - name: SFTPSTORAGEPATH
+                  value: {{ .Values.mongodbDump.env.sftp.storagePath }}
+                - name: EMAILSUBJECT
+                  value: {{ .Values.mongodbDump.env.ssmtpEmail.subject }}
+                - name: EMAILMSGSTART
+                  value: {{ .Values.mongodbDump.env.ssmtpEmail.msgStart }}
+                - name: EMAILMSGSUCCESS
+                  value: {{ .Values.mongodbDump.env.ssmtpEmail.msgSuccess }}
+                - name: EMAILMSGFAIL
+                  value: {{ .Values.mongodbDump.env.ssmtpEmail.msgFail }}
+                - name: EMAILRECIPIENTS
+                  value: {{ .Values.mongodbDump.env.ssmtpEmail.recipients }}
+          restartPolicy: OnFailure
+          imagePullSecrets:
+            - name: {{ .Values.registry.imagePullSecrets }}
+  {{- end }}

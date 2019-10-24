@@ -1,0 +1,27 @@
+mongodbDump:
+  name: mongodb-backup
+  enabled: false
+  schedule: "0 2 * * *"
+  deployment:
+    image:
+      repository: registry.gitlab.com/tools/common-images/mongodb-dump-to-sftp
+      tag: latest
+    imagePullPolicy: Always
+  env:
+    db:
+      host: hidden-backup-host-new
+      port: 23027
+      name: thread
+      user: thread
+      password: passhost123
+    sftp:
+      password: "test123"
+      user: "test"
+      host: "test-mongo"
+      storagePath: "/home/kubernetes/storage/mongo_backup_dumps_testENV"
+    ssmtpEmail:
+      subject: "Mongo_backup"
+      msgStart: "The backup for Mongo has been started"
+      msgSuccess: "The backup for Mongo was successful"
+      msgFail: "The backup for Mongo was failed."
+      recipients: "example@email.pl,example2@email.pl,example3@email.pl"
